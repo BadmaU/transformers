@@ -64,8 +64,9 @@ data/imdb_test.csv
 uv run python scripts/check_env.py
 ```
 
-Скрипт печатает версии и прогоняет крошечную модель (`prajjwal1/bert-tiny`),
-чтобы убедиться, что torch + transformers работают.
+Скрипт печатает версии и прогоняет крошечную модель
+(`hf-internal-testing/tiny-random-bert`), чтобы убедиться, что
+torch + transformers работают.
 
 ## Структура
 
@@ -102,7 +103,10 @@ uv run python scripts/check_env.py
 - для скорости на CPU: `distilbert-base-uncased` (~265 МБ);
 - для русского: `bert-base-multilingual-cased` или `xlm-roberta-base`
   (для второго нужен `sentencepiece`, он уже в зависимостях);
-- для smoke-тестов: `prajjwal1/bert-tiny` (~17 МБ).
+- для smoke-тестов: `hf-internal-testing/tiny-random-bert` (~1.7 МБ).
+  `prajjwal1/bert-tiny` для этого не подходит: в его репозитории нет
+  `tokenizer.json`, и transformers 5.x не собирает токенизатор из одного
+  `vocab.txt`.
 
 ### Практические советы
 

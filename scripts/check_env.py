@@ -22,7 +22,9 @@ def print_versions() -> None:
         print(f"GPU:          {torch.cuda.get_device_name(0)}")
 
 
-def run_tiny_model(model_name: str = "prajjwal1/bert-tiny") -> None:
+def run_tiny_model(
+    model_name: str = "hf-internal-testing/tiny-random-bert",
+) -> None:
     print(f"\nЗагружаю {model_name} ...")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     model = AutoModel.from_pretrained(model_name)

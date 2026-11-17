@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from datasets import Dataset, load_dataset
+from datasets import Dataset, get_dataset_split_names, load_dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
@@ -54,6 +54,12 @@ def parse_args() -> argparse.Namespace:
         help="ограничить число строк в каждом сплите (удобно для CPU)",
     )
     parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="seed для случайной подвыборки при --max-rows (по умолчанию: 42)",
+    )
+    parser.add_argument(
         "--out-dir",
         type=Path,
         default=DATA_DIR,
@@ -83,12 +89,33 @@ def normalize_columns(split: Dataset) -> Dataset:
     return split.select_columns(["text", "label"])
 
 
+def limit_rows(
+    split: Dataset,
+    max_rows: int | None,
+    seed: int = 42,
+) -> Dataset:
+    """Случайно выбрать max_rows строк, а не первые подряд.
+
+    В IMDB первые 12 500 отзывов — отрицательные, поэтому `select(range(n))`
+    дал бы подвыборку только с label=0.
+    """
+    if max_rows is None or max_rows >= len(split):
+        return split
+    return split.shuffle(seed=seed).select(range(max_rows))
+
+
 def main() -> None:
     args = parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
 
     dataset_id = DATASET_ALIASES.get(args.dataset, args.dataset)
-    dataset = load_dataset(dataset_id, args.config)
+    split_names = get_dataset_split_names(dataset_id, args.config)
+    needed_splits = [name for name in split_names if name not in SKIP_SPLITS]
+    if not needed_splits:
+        raise ValueError(f"В {dataset_id} нет размеченных сплитов: {split_names}")
+
+    loaded_splits = load_dataset(dataset_id, args.config, split=needed_splits)
+    dataset = dict(zip(needed_splits, loaded_splits))
     print(f"Загружен {dataset_id}: {dataset}")
 
     slug = args.dataset.replace("/", "_")
@@ -101,7 +128,7 @@ def main() -> None:
             continue
 
         if args.max_rows is not None:
-            split = split.select(range(min(args.max_rows, len(split))))
+            split = limit_rows(split, args.max_rows, seed=args.seed)
 
         split = normalize_columns(split)
         out_path = args.out_dir / f"{slug}_{split_name}.csv"
