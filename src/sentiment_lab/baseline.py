@@ -5,12 +5,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
+import joblib
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score
 from sklearn.model_selection import train_test_split
 
 DEFAULT_RESULTS_PATH = Path("outputs/baseline_results.txt")
+DEFAULT_MODEL_PATH = Path("models/baseline_model.pkl")
 
 
 @dataclass(frozen=True)
@@ -48,6 +50,21 @@ def train_baseline(
         report=classification_report(y_test, y_pred),
         macro_f1=float(f1_score(y_test, y_pred, average="macro")),
     )
+
+
+def save_model(
+    model: LogisticRegression,
+    path: Path | str = DEFAULT_MODEL_PATH,
+) -> Path:
+    """Сохранить обученный baseline с помощью joblib."""
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(model, path)
+    return path
+
+
+def load_model(path: Path | str = DEFAULT_MODEL_PATH) -> LogisticRegression:
+    return joblib.load(path)
 
 
 def save_results(

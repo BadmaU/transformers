@@ -154,6 +154,25 @@ save_finetuned(model, tokenizer, result)
 Модель сохраняется в `models/fine_tuned_model`, метрики — в
 `outputs/fine_tuned_results.txt`.
 
+## Инференс и сравнение
+
+Пошаговое выполнение задач Дня 6 — в `notebooks/06_comparison.ipynb`.
+Предсказания в `sentiment_lab.inference`, confusion matrix — в
+`sentiment_lab.evaluation`:
+
+```python
+from sentiment_lab.inference import predict_baseline, predict_fine_tuned
+
+preds_ft = predict_fine_tuned(["Great movie!"], model_ft, tokenizer)
+preds_base = predict_baseline(
+    ["Great movie!"], baseline_model, tokenizer, encoder_model
+)
+```
+
+Базовый вариант из задания использует TF-IDF `vectorizer`; здесь baseline
+обучен на CLS-эмбеддингах, поэтому `predict_baseline` принимает `tokenizer`
+и `encoder_model`.
+
 ## Тесты
 
 ```bash
@@ -170,7 +189,8 @@ uv run pytest
 │   ├── 02_embeddings.ipynb    # задачи Дня 2 по шагам
 │   ├── 03_attention.ipynb     # задачи Дня 3 по шагам
 │   ├── 04_baseline.ipynb      # задачи Дня 4 по шагам
-│   └── 05_finetuning.ipynb    # задачи Дня 5 по шагам
+│   ├── 05_finetuning.ipynb    # задачи Дня 5 по шагам
+│   └── 06_comparison.ipynb    # задачи Дня 6 по шагам
 ├── scripts/
 │   ├── check_env.py       # smoke-тест окружения
 │   └── download_data.py   # загрузка IMDB -> CSV
@@ -181,7 +201,9 @@ uv run pytest
 │   ├── attention.py       # attention-веса, heatmap, разбор по слоям/головам
 │   ├── baseline.py        # LogisticRegression, метрики, сохранение результатов
 │   ├── dataset.py         # SentimentDataset для классификации
-│   └── training.py        # train_epoch, evaluate, обучение, сохранение модели
+│   ├── training.py        # train_epoch, evaluate, обучение, сохранение модели
+│   ├── inference.py       # predict_fine_tuned / predict_baseline
+│   └── evaluation.py      # confusion matrix и визуализация ошибок
 ├── tests/                 # pytest-тесты
 ├── main.py                # точка входа для PyCharm
 ├── pyproject.toml
