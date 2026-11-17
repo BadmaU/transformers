@@ -17,7 +17,7 @@
 uv sync
 ```
 
-Опционально — демо на Gradio (день 7):
+Опционально — демо на FastAPI (день 7):
 
 ```bash
 uv sync --group demo
@@ -173,6 +173,49 @@ preds_base = predict_baseline(
 обучен на CLS-эмбеддингах, поэтому `predict_baseline` принимает `tokenizer`
 и `encoder_model`.
 
+## Анализ ошибок
+
+Пошаговое выполнение задач Дня 7 — в `notebooks/07_error_analysis.ipynb`.
+Разбор FP/FN и сохранение отчёта — в `sentiment_lab.error_analysis`:
+
+```python
+from sentiment_lab.error_analysis import analyze_errors, save_error_report
+
+analysis = analyze_errors(texts, true_labels, pred_labels)
+path = save_error_report(analysis)
+```
+
+Отчёты: `outputs/error_analysis.txt` и `outputs/comparison_results.txt`.
+
+### Результаты на 500 отзывах `imdb_test`
+
+| Модель | Accuracy | Macro F1 |
+|--------|----------|----------|
+| Fine-tuned | 0.8080 | 0.8032 |
+| Baseline | 0.7740 | 0.7739 |
+
+Улучшение macro F1: **3.78%**. В ошибках fine-tuned модели 14 FP и 82 FN,
+средняя длина ошибочных текстов 1327 символов против 1287 у всех.
+
+## FastAPI-демо
+
+```bash
+uv sync --group demo
+uv run uvicorn api:app --reload
+```
+
+POST http://127.0.0.1:8000/predict:
+
+```bash
+curl -X POST http://127.0.0.1:8000/predict \
+  -H "Content-Type: application/json" \
+  -d "{\"text\": \"Great movie!\"}"
+```
+
+Ответ содержит `prediction`, `label` и вероятности по классам. Модель
+двуклассовая (`Negative` / `Positive`); `Neutral` из примера задания здесь
+нет, потому что IMDB размечен на 0/1.
+
 ## Тесты
 
 ```bash
@@ -190,7 +233,8 @@ uv run pytest
 │   ├── 03_attention.ipynb     # задачи Дня 3 по шагам
 │   ├── 04_baseline.ipynb      # задачи Дня 4 по шагам
 │   ├── 05_finetuning.ipynb    # задачи Дня 5 по шагам
-│   └── 06_comparison.ipynb    # задачи Дня 6 по шагам
+│   ├── 06_comparison.ipynb    # задачи Дня 6 по шагам
+│   └── 07_error_analysis.ipynb # задачи Дня 7 по шагам
 ├── scripts/
 │   ├── check_env.py       # smoke-тест окружения
 │   └── download_data.py   # загрузка IMDB -> CSV
@@ -203,8 +247,10 @@ uv run pytest
 │   ├── dataset.py         # SentimentDataset для классификации
 │   ├── training.py        # train_epoch, evaluate, обучение, сохранение модели
 │   ├── inference.py       # predict_fine_tuned / predict_baseline
-│   └── evaluation.py      # confusion matrix и визуализация ошибок
+│   ├── evaluation.py      # confusion matrix и сравнение метрик
+│   └── error_analysis.py  # FP/FN, отчёт с наблюдениями
 ├── tests/                 # pytest-тесты
+├── api.py                 # FastAPI /predict
 ├── main.py                # точка входа для PyCharm
 ├── pyproject.toml
 └── README.md
@@ -224,7 +270,7 @@ uv run pytest
 | 4 | Baseline | CLS-эмбеддинги + LogisticRegression, метрики | `sklearn`, `pandas` |
 | 5 | Fine-tuning | Дообучение `distilbert-base-uncased` | `Dataset`, `DataLoader`, `torch.optim.AdamW` |
 | 6 | Сравнение | Accuracy/F1, confusion matrix, скорость, размер | `evaluate`, `seaborn` |
-| 7 | Анализ и демо | Разбор ошибок, Gradio-приложение | `gradio` (группа `demo`) |
+| 7 | Анализ и демо | Разбор ошибок, FastAPI-приложение | `fastapi`, `uvicorn` (группа `demo`) |
 
 ### Рекомендуемые модели
 
