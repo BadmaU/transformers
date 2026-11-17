@@ -1,22 +1,47 @@
 [project]
-name = "transformers"
+name = "sentiment-lab"
 version = "0.1.0"
-description = "Add your description here"
+description = "7-day transformer course: sentiment analysis from tokenization to fine-tuning"
 readme = "README.md"
 authors = [
     { name = "BadmaU", email = "u.badma@mail.ru" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    # --- модели и обучение ---
+    "torch>=2.9,<3",
+    "transformers>=5.0,<6",
+    "accelerate>=1.0,<2",
+    "datasets>=4.0,<6",
+    "evaluate>=0.4,<1",
+    "sentencepiece>=0.2,<1",
+    # --- данные и метрики ---
+    "numpy>=2.0,<3",
+    "pandas>=2.2,<4",
+    "scikit-learn>=1.6,<2",
+    # --- графики ---
+    "matplotlib>=3.9,<4",
+    "seaborn>=0.13,<1",
+    # --- ноутбуки и прогресс ---
+    "jupyterlab>=4.3,<5",
+    "ipykernel>=6.29,<8",
+    "ipywidgets>=8.1,<9",
+    "tqdm>=4.66,<5",
+]
 
 [project.scripts]
-transformers = "transformers:main"
+sentiment-lab = "sentiment_lab:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3,<10",
+    "ruff>=0.9,<1",
+]
+# ставится отдельно: uv sync --group demo
+demo = [
+    "gradio>=5,<7",
+]
 
 [build-system]
 requires = ["uv_build>=0.12.6,<0.13.0"]
 build-backend = "uv_build"
-
-[tool.uv.workspace]
-members = [
-    "transformers",
-]
