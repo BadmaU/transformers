@@ -52,6 +52,9 @@ data/imdb_test.csv
   `uv run python scripts/download_data.py --dataset tweet_eval --config sentiment`;
 - русский: `blinoff/kinopoisk` или `sepidmnorozy/Russian_sentiment`.
 
+Короткие имена `imdb`, `sst2`, `tweet_eval` поддерживаются; для остальных
+датасетов указывайте полный id вида `namespace/name`.
+
 Скрипт сам приводит колонки к формату `text,label`, даже если в исходном
 датасете текст называется `sentence`, `review` или `content`.
 

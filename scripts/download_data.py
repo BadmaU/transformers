@@ -27,6 +27,9 @@ DATASET_ALIASES = {
     "tweet_eval": "cardiffnlp/tweet_eval",
 }
 
+# в IMDB у этого сплита label = -1, для обучения он не нужен
+SKIP_SPLITS = {"unsupervised"}
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -93,6 +96,10 @@ def main() -> None:
         slug = f"{slug}_{args.config}"
 
     for split_name, split in dataset.items():
+        if split_name in SKIP_SPLITS:
+            print(f"{split_name}: пропущен (нет размеченных данных)")
+            continue
+
         if args.max_rows is not None:
             split = split.select(range(min(args.max_rows, len(split))))
 
