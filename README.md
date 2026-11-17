@@ -137,6 +137,23 @@ print(f"Macro F1: {result.macro_f1:.3f}")
 save_results(result)
 ```
 
+## Fine-tuning
+
+Пошаговое выполнение задач Дня 5 — в `notebooks/05_finetuning.ipynb`.
+`SentimentDataset` в `sentiment_lab.dataset`, цикл обучения и сохранение —
+в `sentiment_lab.training`. В transformers 5.x используется `torch.optim.AdamW`
+(`transformers.AdamW` больше нет).
+
+```python
+from sentiment_lab.training import save_finetuned, train_model
+
+result = train_model(model, train_loader, val_loader, num_epochs=3)
+save_finetuned(model, tokenizer, result)
+```
+
+Модель сохраняется в `models/fine_tuned_model`, метрики — в
+`outputs/fine_tuned_results.txt`.
+
 ## Тесты
 
 ```bash
@@ -152,7 +169,8 @@ uv run pytest
 │   ├── 01_tokenization.ipynb  # задачи Дня 1 по шагам
 │   ├── 02_embeddings.ipynb    # задачи Дня 2 по шагам
 │   ├── 03_attention.ipynb     # задачи Дня 3 по шагам
-│   └── 04_baseline.ipynb      # задачи Дня 4 по шагам
+│   ├── 04_baseline.ipynb      # задачи Дня 4 по шагам
+│   └── 05_finetuning.ipynb    # задачи Дня 5 по шагам
 ├── scripts/
 │   ├── check_env.py       # smoke-тест окружения
 │   └── download_data.py   # загрузка IMDB -> CSV
@@ -161,7 +179,9 @@ uv run pytest
 │   ├── tokenization.py    # токенизатор, батчи, разбор токенов
 │   ├── embeddings.py      # hidden states, CLS-эмбеддинги, сходство
 │   ├── attention.py       # attention-веса, heatmap, разбор по слоям/головам
-│   └── baseline.py        # LogisticRegression, метрики, сохранение результатов
+│   ├── baseline.py        # LogisticRegression, метрики, сохранение результатов
+│   ├── dataset.py         # SentimentDataset для классификации
+│   └── training.py        # train_epoch, evaluate, обучение, сохранение модели
 ├── tests/                 # pytest-тесты
 ├── main.py                # точка входа для PyCharm
 ├── pyproject.toml
@@ -179,8 +199,8 @@ uv run pytest
 | 1 | Токенизация | Word-level vs BPE, `input_ids`, `attention_mask`, `decode` | `AutoTokenizer` |
 | 2 | Hidden states | Эмбеддинги последнего слоя, mean-pooling, косинусная близость | `AutoModel(..., output_hidden_states=True)` |
 | 3 | Attention | Тепловые карты внимания по слоям и головам | `output_attentions=True` |
-| 4 | Baseline | TF-IDF + LogisticRegression, метрики | `sklearn`, `pandas` |
-| 5 | Fine-tuning | Дообучение `distilbert-base-uncased` | `Trainer` / `TrainingArguments` |
+| 4 | Baseline | CLS-эмбеддинги + LogisticRegression, метрики | `sklearn`, `pandas` |
+| 5 | Fine-tuning | Дообучение `distilbert-base-uncased` | `Dataset`, `DataLoader`, `torch.optim.AdamW` |
 | 6 | Сравнение | Accuracy/F1, confusion matrix, скорость, размер | `evaluate`, `seaborn` |
 | 7 | Анализ и демо | Разбор ошибок, Gradio-приложение | `gradio` (группа `demo`) |
 
