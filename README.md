@@ -68,16 +68,44 @@ uv run python scripts/check_env.py
 (`hf-internal-testing/tiny-random-bert`), чтобы убедиться, что
 torch + transformers работают.
 
+## Токенизация
+
+Пошаговое выполнение задач Дня 1 — в `notebooks/01_tokenization.ipynb`.
+Переиспользуемый код живёт в `src/sentiment_lab/tokenization.py`:
+
+```python
+from sentiment_lab.tokenization import (
+    explain_tokenization,
+    load_tokenizer,
+    tokenize_texts,
+)
+
+tokenizer = load_tokenizer()
+batch = tokenize_texts(tokenizer, ["Отличный фильм!", "Ужасный фильм."])
+print(explain_tokenization("Transformers are amazing!", tokenizer))
+```
+
+## Тесты
+
+```bash
+uv run pytest
+```
+
 ## Структура
 
 ```
 .
 ├── data/                  # датасеты (в git не попадают)
-├── notebooks/             # по одному ноутбуку на день
+├── notebooks/
+│   └── 01_tokenization.ipynb  # задачи Дня 1 по шагам
 ├── scripts/
 │   ├── check_env.py       # smoke-тест окружения
 │   └── download_data.py   # загрузка IMDB -> CSV
-├── src/sentiment_lab/     # общий код, который переиспользуется из ноутбуков
+├── src/sentiment_lab/
+│   ├── __init__.py        # точка входа пакета
+│   └── tokenization.py    # токенизатор, батчи, разбор токенов
+├── tests/                 # pytest-тесты
+├── main.py                # точка входа для PyCharm
 ├── pyproject.toml
 └── README.md
 ```

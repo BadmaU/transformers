@@ -46,7 +46,7 @@ def main() -> None:
     print_versions()
     try:
         run_tiny_model()
-    except Exception as exc:  # noqa: BLE001 - smoke-тест должен показать любую ошибку
+    except Exception as exc:
         print(f"\nНе удалось прогнать модель: {exc}")
         raise SystemExit(1) from exc
 
