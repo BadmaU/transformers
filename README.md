@@ -101,6 +101,42 @@ print(embeddings.shape)
 print(similarity("Отличный фильм!", "Ужасный фильм.", tokenizer, model))
 ```
 
+## Attention
+
+Пошаговое выполнение задач Дня 3 — в `notebooks/03_attention.ipynb`.
+Код в `src/sentiment_lab/attention.py`; heatmap сохраняются в `outputs/`:
+
+```python
+from sentiment_lab.attention import (
+    attention_for_token,
+    get_attention,
+    load_attention_model,
+    visualize_attention,
+)
+from sentiment_lab.tokenization import load_tokenizer
+
+tokenizer = load_tokenizer()
+model = load_attention_model()
+tokens, attentions = get_attention("The amazing movie won many awards", tokenizer, model)
+visualize_attention(tokens, attentions, tokenizer, layer=0, head=0)
+print(attention_for_token(tokens, attentions, tokenizer, "movie", 0, 0))
+```
+
+## Baseline
+
+Пошаговое выполнение задач Дня 4 — в `notebooks/04_baseline.ipynb`.
+Логистическая регрессия на CLS-эмбеддингах в `src/sentiment_lab/baseline.py`,
+результат сохраняется в `outputs/baseline_results.txt`:
+
+```python
+from sentiment_lab.baseline import save_results, train_baseline
+
+result = train_baseline(embeddings, labels)
+print(result.report)
+print(f"Macro F1: {result.macro_f1:.3f}")
+save_results(result)
+```
+
 ## Тесты
 
 ```bash
@@ -114,14 +150,18 @@ uv run pytest
 ├── data/                  # датасеты (в git не попадают)
 ├── notebooks/
 │   ├── 01_tokenization.ipynb  # задачи Дня 1 по шагам
-│   └── 02_embeddings.ipynb    # задачи Дня 2 по шагам
+│   ├── 02_embeddings.ipynb    # задачи Дня 2 по шагам
+│   ├── 03_attention.ipynb     # задачи Дня 3 по шагам
+│   └── 04_baseline.ipynb      # задачи Дня 4 по шагам
 ├── scripts/
 │   ├── check_env.py       # smoke-тест окружения
 │   └── download_data.py   # загрузка IMDB -> CSV
 ├── src/sentiment_lab/
 │   ├── __init__.py        # точка входа пакета
 │   ├── tokenization.py    # токенизатор, батчи, разбор токенов
-│   └── embeddings.py      # hidden states, CLS-эмбеддинги, сходство
+│   ├── embeddings.py      # hidden states, CLS-эмбеддинги, сходство
+│   ├── attention.py       # attention-веса, heatmap, разбор по слоям/головам
+│   └── baseline.py        # LogisticRegression, метрики, сохранение результатов
 ├── tests/                 # pytest-тесты
 ├── main.py                # точка входа для PyCharm
 ├── pyproject.toml
