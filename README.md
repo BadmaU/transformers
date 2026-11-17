@@ -85,6 +85,22 @@ batch = tokenize_texts(tokenizer, ["Отличный фильм!", "Ужасны
 print(explain_tokenization("Transformers are amazing!", tokenizer))
 ```
 
+## Эмбеддинги
+
+Пошаговое выполнение задач Дня 2 — в `notebooks/02_embeddings.ipynb`.
+Переиспользуемый код живёт в `src/sentiment_lab/embeddings.py`:
+
+```python
+from sentiment_lab.embeddings import get_embeddings, load_model, similarity
+from sentiment_lab.tokenization import load_tokenizer
+
+tokenizer = load_tokenizer()
+model = load_model()
+embeddings = get_embeddings(["Отличный фильм!", "Ужасный фильм."], tokenizer, model)
+print(embeddings.shape)
+print(similarity("Отличный фильм!", "Ужасный фильм.", tokenizer, model))
+```
+
 ## Тесты
 
 ```bash
@@ -97,13 +113,15 @@ uv run pytest
 .
 ├── data/                  # датасеты (в git не попадают)
 ├── notebooks/
-│   └── 01_tokenization.ipynb  # задачи Дня 1 по шагам
+│   ├── 01_tokenization.ipynb  # задачи Дня 1 по шагам
+│   └── 02_embeddings.ipynb    # задачи Дня 2 по шагам
 ├── scripts/
 │   ├── check_env.py       # smoke-тест окружения
 │   └── download_data.py   # загрузка IMDB -> CSV
 ├── src/sentiment_lab/
 │   ├── __init__.py        # точка входа пакета
-│   └── tokenization.py    # токенизатор, батчи, разбор токенов
+│   ├── tokenization.py    # токенизатор, батчи, разбор токенов
+│   └── embeddings.py      # hidden states, CLS-эмбеддинги, сходство
 ├── tests/                 # pytest-тесты
 ├── main.py                # точка входа для PyCharm
 ├── pyproject.toml
